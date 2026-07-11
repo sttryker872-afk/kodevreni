@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevGiriş Ultimate v2 - Full-Stack Yazılım Ansiklopedisi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght=400;500;600&family=Inter:wght=300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+
+        @keyframes customFadeIn {
+            from { opacity: 0; transform: translateY(10px); filter: blur(3px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .animate-tab-entry {
+            animation: customFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-shake {
+            animation: shake 0.15s ease-in-out 2;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col overflow-hidden">
+
+    <!-- GİRİŞ ŞİFRE EKRANI -->
+    <div id="password-screen" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center transition-all duration-700 ease-in-out">
+        <div id="password-card" class="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 text-center space-y-6 transition-all duration-300">
+            <div class="inline-flex bg-indigo-600/10 text-indigo-400 p-4 rounded-full border border-indigo-500/20 text-3xl animate-bounce">
+                🎓
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-2xl font-bold text-white tracking-tight">Ultimate Müfredat Paneli v2</h2>
+                <p class="text-sm text-slate-400">Gelişmiş Full-Stack yazılım kütüphanesini açmak için şifreyi girin.</p>
+            </div>
+            <div class="space-y-3">
+                <input type="password" id="pwd-input" onkeydown="if(event.key === 'Enter') verifyPassword()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-lg font-semibold tracking-widest text-indigo-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition" placeholder="••••••••">
+                <p id="pwd-error" class="text-xs text-rose-500 font-medium opacity-0 transition-opacity duration-300">Hatalı Anahtar! Şifre: yaz123</p>
+            </div>
+            <button onclick="verifyPassword()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-900/30 transition transform duration-200 cursor-pointer">
+                Tüm Bilgilerin Kilidini Aç →
+            </button>
+        </div>
+    </div>
+
+    <!-- ANA UYGULAMA İÇERİĞİ -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3 group cursor-pointer">
+            <div class="bg-indigo-600 text-white p-2 rounded-lg font-bold text-xl tracking-wider code-font group-hover:scale-110 group-hover:rotate-6 transition duration-300">&lt;/&gt;</div>
+            <div>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">DevGiriş Ultimate</h1>
+                <p class="text-xs text-slate-400">Bütünsel Bilgi Deposu & Canlı Laboratuvar</p>
+            </div>
+        </div>
+        <div class="text-sm bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 text-slate-300">
+            📚 Bölüm: <span id="current-module-title" class="font-semibold text-cyan-400">Algoritmalar & Veri Yapıları</span>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="flex-1 flex flex-col md:flex-row h-[calc(100vh-73px)] overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-80 border-r border-slate-800 bg-slate-950 p-4 overflow-y-auto flex flex-col gap-1.5">
+            <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-2 mb-2">Ansiklopedi İndeksi</h2>
+            
+            <button onclick="switchTab('welcome')" id="btn-welcome" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg bg-indigo-600 text-white font-medium flex items-center gap-3 transition">
+                <span>🧠</span> 01. Bilgisayar Bilimi Bilgisi
+            </button>
+            
+            <button onclick="switchTab('html')" id="btn-html" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-slate-200 font-medium flex items-center gap-3 transition">
+                <span>🌐</span> 02. Profesyonel HTML5 & SEO
+            </button>
+            
+            <button onclick="switchTab('css')" id="btn-css" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-slate-200 font-medium flex items-center gap-3 transition">
+                <span>🎨</span> 03. İleri Mimari CSS & Grid
+            </button>
+            
+            <button onclick="switchTab('js')" id="btn-js" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-slate-200 font-medium flex items-center gap-3 transition">
+                <span>⚡</span> 04. Modern JS & Asenkron Mimari
+            </button>
+
+            <button onclick="switchTab('db')" id="btn-db" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-slate-200 font-medium flex items-center gap-3 transition">
+                <span>🗄️</span> 05. Veritabanı & Git Dünyası
+            </button>
+
+            <div class="border-t border-slate-800 my-4 pt-4">
+                <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-2 mb-2">Geliştirme Üssü</h2>
+                <button onclick="switchTab('playground')" id="btn-playground" class="nav-btn w-full text-left px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-900 hover:text-slate-200 font-medium flex items-center gap-3 transition border border-dashed border-slate-800 hover:border-indigo-500/40">
+                    <span>🛠️</span> Canlı Kod Laboratuvarı
+                </button>
+            </div>
+        </aside>
+
+        <!-- Content Canvas -->
+        <main class="flex-1 p-6 overflow-y-auto bg-slate-900">
+            
+            <!-- MODULE 1: COMP SCI / ALGORITMALAR -->
+            <div id="tab-welcome" class="tab-content space-y-6 animate-tab-entry">
+                <div class="max-w-4xl space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">Bilgisayar Bilimi, Veri Yapıları ve Algoritmalar</h2>
+                        <p class="text-slate-400 mt-2">Sadece kod yazan değil, yazdığı kodun maliyetini ve performansını hesaplayan bir mühendis olmanın temelleri.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-indigo-400 flex items-center gap-2">📊 Temel Veri Yapıları (Data Structures)</h3>
+                            <p class="text-xs text-slate-400">Veriyi bellekte nasıl tuttuğumuz, algoritmanın hızını belirler:</p>
+                            <ul class="space-y-2 text-xs leading-relaxed text-slate-300">
+                                <li><strong class="text-amber-400">Arrays (Diziler):</strong> Bellekte yan yana sıralı kutulardır. İndis (index) ile veriye erişim çok hızlıdır (O(1)) ama araya eleman eklemek maliyetlidir.</li>
+                                <li><strong class="text-cyan-400">Objects / Hash Maps:</strong> Anahtar-değer (Key-Value) çiftleriyle çalışır. Benzersiz bir anahtarla arama yaparken veriyi anında bulur.</li>
+                                <li><strong class="text-emerald-400">Stacks & Queues:</strong> Stack mantığı "Son Gelen İlk Çıkar" (LIFO - Örn: Tarayıcı geri butonu). Queue mantığı "İlk Gelen İlk Çıkar" (FIFO - Örn: Sunucu istek kuyruğu).</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-rose-400 flex items-center gap-2">⏱️ Zaman Karmaşıklığı (Big O Notation)</h3>
+                            <p class="text-xs text-slate-400">Yazdığın algoritmanın veri miktarı arttıkça ne kadar yavaşlayacağını ölçme standardıdır:</p>
+                            <ul class="space-y-2 text-xs leading-relaxed text-slate-300">
+                                <li><code class="text-rose-400 bg-rose-950/40 px-1 rounded">O(1) - Sabit Zaman:</code> Veri boyutu ne olursa olsun işlem süresi değişmez. (Örn: Dizinin ilk elemanını okumak).</li>
+                                <li><code class="text-amber-400 bg-amber-950/40 px-1 rounded">O(n) - Lineer Zaman:</code> Veri arttıkça süre de doğru orantılı artırır. (Örn: Dizide döngüyle bir eleman aramak).</li>
+                                <li><code class="text-red-400 bg-red-950/40 px-1 rounded">O(n²) - Karesel Zaman:</code> İç içe iki döngü demektir, büyük verilerde sistemi kilitler. Kaçınılması gerekir.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Gelişmiş Algoritma Analizi: Bubble Sort (Kabarcık Sıralaması) Mantığı</h3>
+                        <p class="text-xs text-slate-400">Dizideki yan yana elemanları karşılaştırıp yerlerini değiştirerek yapılan basit ama yavaş (O(n²)) bir sıralama algoritması mantık akışı:</p>
+                        <pre class="code-font text-xs bg-slate-900 p-4 rounded-lg text-emerald-400 border border-slate-800/60 leading-relaxed overflow-x-auto">
+FONKSİYON bubbleSort(dizi) {
+    let n = dizi.uzunluk;
+    FOR (let i = 0; i < n; i++) {
+        FOR (let j = 0; j < n - i - 1; j++) {
+            EĞER dizi[j] > dizi[j+1] İSE {
+                // Elemanların yerini takas et (Swap)
+                let gecici = dizi[j];
+                dizi[j] = dizi[j+1];
+                dizi[j+1] = gecici;
+            }
+        }
+    }
+    DÖNDÜR dizi;
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 2: HTML5 & SEO -->
+            <div id="tab-html" class="tab-content hidden space-y-6">
+                <div class="max-w-4xl space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">Kurumsal HTML5 Mimarisi & SEO Standartları</h2>
+                        <p class="text-slate-400 mt-2">Arama motorlarında üst sıralara çıkan, ekran okuyuculara uyumlu ve modern multimedya destekli yapılar.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <h3 class="font-bold text-indigo-400 text-sm">🔍 Meta Etiketleri & SEO</h3>
+                            <p class="text-xs text-slate-400 leading-relaxed">Tarayıcıya ve Google botlarına site hakkında kritik veriler sunar:</p>
+                            <pre class="code-font text-[10px] bg-slate-900 p-2 rounded text-cyan-400 border border-slate-800">
+&lt;meta name="description" content="Açıklama"&gt;
+&lt;meta name="keywords" content="kelimeler"&gt;
+&lt;meta property="og:title" content="Sosyal Medya Başlığı"&gt;</pre>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <h3 class="font-bold text-emerald-400 text-sm">♿ Erişilebilirlik (ARIA & Alt)</h3>
+                            <p class="text-xs text-slate-400 leading-relaxed">Görme engelli bireylerin kullandığı ekran okuyucular için standartlar:</p>
+                            <pre class="code-font text-[10px] bg-slate-900 p-2 rounded text-cyan-400 border border-slate-800">
+&lt;img src="logo.png" alt="Şirket Logosu"&gt;
+&lt;button aria-label="Menüyü Kapat"&gt;&lt;/button&gt;
+&lt;input aria-required="true"&gt;</pre>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <h3 class="font-bold text-amber-400 text-sm">🎥 Multimedya Yapıları</h3>
+                            <p class="text-xs text-slate-400 leading-relaxed">Eklentisiz, doğrudan tarayıcı içinde video, ses ve çizim alanları yönetimi:</p>
+                            <pre class="code-font text-[10px] bg-slate-900 p-2 rounded text-cyan-400 border border-slate-800">
+&lt;video controls src="video.mp4"&gt;&lt;/video&gt;
+&lt;audio controls src="ses.mp3"&gt;&lt;/audio&gt;
+&lt;canvas id="grafik"&gt;&lt;/canvas></pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="font-bold text-slate-300 text-sm uppercase tracking-wider">Veri Depolama Girişi: Web Storage API</h3>
+                        <p class="text-xs text-slate-400">HTML5 ile birlikte çerezler (cookies) yerine tarayıcı hafızasında veri saklamak için iki devasa mekanizma geldi:</p>
+                        <ul class="space-y-2 text-xs text-slate-300 leading-relaxed">
+                            <li><strong>LocalStorage:</strong> Kullanıcı tarayıcıyı, hatta bilgisayarı kapatsa bile veriler silinmez (Örn: Tema tercihi, sepet bilgisi).</li>
+                            <li><strong>SessionStorage:</strong> Veriler sadece açık olan sekme kapatılana kadar yaşar, sekme kapandığı an imha edilir.</li>
+                        </ul>
+                    </div>
+
+                    <button onclick="loadDemo('html')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-indigo-500/20 transition transform hover:-translate-y-0.5 active:translate-y-0 text-sm cursor-pointer">
+                        HTML5 Form ve SEO Doğrulamasını Sandbox'ta Başlat →
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 3: CSS & GRID -->
+            <div id="tab-css" class="tab-content hidden space-y-6">
+                <div class="max-w-4xl space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">İleri Mimari CSS, Grid System & Duyarlılık</h2>
+                        <p class="text-slate-400 mt-2">Karmaşık iki boyutlu dashboard düzenleri, CSS Değişkenleri ve Mobile-First tasarım yaklaşımları.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-cyan-400 flex items-center gap-2">🏁 İki Boyutlu CSS Grid Düzeni</h3>
+                            <p class="text-xs text-slate-400">Flexbox tek yönlü (satır veya sütun) hizalama yaparken, Grid sistemi aynı anda hem satırı hem sütunu tek merkezden yönetir:</p>
+                            <pre class="code-font text-xs bg-slate-900 p-3 rounded-lg text-slate-300 border border-slate-800">
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 eşit sütun */
+    grid-template-rows: auto;
+    gap: 20px; /* Elemanlar arası boşluk */
+}</pre>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-amber-400 flex items-center gap-2">📱 Medya Sorguları (Media Queries)</h3>
+                            <p class="text-xs text-slate-400">Sitenin telefon, tablet ve monitör ekranlarına göre otomatik şekil değiştirmesini sağlar (Responsive):</p>
+                            <pre class="code-font text-xs bg-slate-900 p-3 rounded-lg text-slate-300 border border-slate-800">
+/* Mobil öncelikli tasarım bittikten sonra tablet/masaüstü ayarı */
+@media (min-width: 768px) {
+    .sidebar { display: block; }
+    .main-content { font-size: 16px; }
+}</pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="font-bold text-purple-400 text-sm">🎨 CSS Değişkenleri (Custom Properties) & Animasyonlar</h3>
+                        <p class="text-xs text-slate-400">Kod tekrarını önlemek için global renk ve boyut değişkenleri tanımlayıp, `@keyframes` ile donanım hızlandırmalı akıcı animasyonlar tetikleyebilirsiniz:</p>
+                        <pre class="code-font text-xs bg-slate-900 p-3 rounded-lg text-indigo-300 border border-slate-800">
+:root {
+    --ana-renk: #4f46e5;
+}
+.buton { background-color: var(--ana-renk); }
+
+@keyframes nabiz {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}</pre>
+                    </div>
+
+                    <button onclick="loadDemo('css')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-indigo-500/20 transition transform hover:-translate-y-0.5 active:translate-y-0 text-sm cursor-pointer">
+                        CSS Grid ve Değişken Yapılarını Canlı Test Et →
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 4: JS & ASYNC -->
+            <div id="tab-js" class="tab-content hidden space-y-6">
+                <div class="max-w-4xl space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">Modern JavaScript (ES6+) & Asenkron Mimari</h2>
+                        <p class="text-slate-400 mt-2">Dizileri uçurma yöntemleri, yıkıcı atamalar ve uzak sunuculardan (API) veri çekme mekanizmaları.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-emerald-400 flex items-center gap-2">🚀 Modern ES6+ Standartları</h3>
+                            <p class="text-xs text-slate-400">Kod yazma hızını ve okunabilirliğini artıran yeni nesil JavaScript sözdizimi:</p>
+                            <pre class="code-font text-xs bg-slate-900 p-3 rounded-lg text-slate-300 border border-slate-800 leading-relaxed">
+// Arrow Function (Ok Fonksiyonu)
+const topla = (a, b) => a + b;
+
+// Destructuring (Objeyi/Diziyi Parçalama)
+const user = { ad: "Can", rol: "Admin" };
+const { ad, rol } = user; // Tek hamlede dışarı çıkarma</pre>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-amber-400 flex items-center gap-2">🔄 İleri Dizi Metotları</h3>
+                            <p class="text-xs text-slate-400">Klasik `for` döngüleri yerine dizileri manipüle eden işlevsel fonksiyonlar:</p>
+                            <pre class="code-font text-xs bg-slate-900 p-3 rounded-lg text-slate-300 border border-slate-800 leading-relaxed">
+const sayilar = [1, 2, 3, 4];
+// Tüm elemanları 2 ile çarpıp yeni dizi üretir:
+const katlar = sayilar.map(x => x * 2); 
+// 2'den büyük olanları filtreler:
+const buyukler = sayilar.filter(x => x > 2);</pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <h3 class="font-bold text-cyan-400 flex items-center gap-2">🌐 Asenkron JS: Promises, Async/Await & Fetch API</h3>
+                        <p class="text-xs text-slate-400">JavaScript tek kanallı (single-threaded) bir dildir. Uzak bir sunucudan veri çekilirken uygulamanın donmaması için asenkron yapıları kullanırız:</p>
+                        <pre class="code-font text-xs bg-slate-900 p-3 rounded-lg text-cyan-400 border border-slate-800 leading-relaxed">
+// Gerçek zamanlı dış dünyadan API verisi çekme fonksiyon kalıbı
+async function verileriGetir() {
+    try {
+        let response = await fetch('https://api.github.com/users/github');
+        let data = await response.json(); // Gelen ham metni JSON objesine çevirir
+        console.log("Kullanıcı Adı: " + data.name);
+    } catch (hata) {
+        console.error("Veri alınırken hata oluştu kanka: ", hata);
+    }
+}</pre>
+                    </div>
+
+                    <button onclick="loadDemo('js')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-indigo-500/20 transition transform hover:-translate-y-0.5 active:translate-y-0 text-sm cursor-pointer">
+                        Asenkron API İstek Simülasyonunu Çalıştır →
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODULE 5: DATABASE & GIT -->
+            <div id="tab-db" class="tab-content hidden space-y-6">
+                <div class="max-w-4xl space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white tracking-tight">Veritabanı Mimarileri & Git Sürüm Kontrolü</h2>
+                        <p class="text-slate-400 mt-2">Büyük verileri nerede saklayacağımızı seçmek ve projeleri ekip halinde hatasız yönetmek.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-blue-400 flex items-center gap-2">🗄️ SQL vs NoSQL Karşılaştırması</h3>
+                            <p class="text-xs text-slate-400">Veritabanı türünü projenin ihtiyacına göre seçmeliyiz:</p>
+                            <ul class="space-y-2 text-xs leading-relaxed text-slate-300">
+                                <li><strong class="text-blue-400">Relational (SQL):</strong> Veriler tablolar, satırlar ve katı kurallarla tutulur. İlişkisel yapılardır (Örn: MySQL, PostgreSQL). Finansal işlemler ve e-ticaret için harikadır.</li>
+                                <li><strong class="text-emerald-400">Non-Relational (NoSQL):</strong> Veriler esnek JSON dokümanları şeklinde tutulur (Örn: MongoDB). Çok hızlı genişler (Scalability) ve anlık büyük veri akışlarında (chat, loglama) tercih edilir.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-amber-500 flex items-center gap-2">🌿 Temel Git Komut Kütüphanesi</h3>
+                            <p class="text-xs text-slate-400">Kodların sürümlerini kaydetmek ve GitHub/GitLab üzerine yüklemek için kullanılan çekirdek komutlar:</p>
+                            <ul class="space-y-1.5 text-xs text-slate-300">
+                                <li><code class="text-amber-400 bg-slate-900 px-1 py-0.5 rounded code-font">git init</code> : Bulunduğun klasörde boş bir Git deposu başlatır.</li>
+                                <li><code class="text-amber-400 bg-slate-900 px-1 py-0.5 rounded code-font">git add .</code> : Değişen tüm dosyaları kayıt listesine ekler.</li>
+                                <li><code class="text-amber-400 bg-slate-900 px-1 py-0.5 rounded code-font">git commit -m "mesaj"</code> : Değişiklikleri yerel hafızaya mühürler.</li>
+                                <li><code class="text-amber-400 bg-slate-900 px-1 py-0.5 rounded code-font">git push origin main</code> : Kodları buluttaki ana sunucuya postalar.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button onclick="loadDemo('db')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-indigo-500/20 transition transform hover:-translate-y-0.5 active:translate-y-0 text-sm cursor-pointer">
+                        Veritabanı Kayıt Modellemesini Canlı Test Et →
+                    </button>
+                </div>
+            </div>
+
+            <!-- PLAYGROUND TAB -->
+            <div id="tab-playground" class="tab-content hidden h-full flex flex-col gap-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Gelişmiş Laboratuvar Üssü (srcdoc Engine v2)</h2>
+                        <p class="text-xs text-slate-400">Kodları değiştirip "Kodu Çalıştır" butonuna bas kanka. iframe koruması kaldırıldı.</p>
+                    </div>
+                    <button onclick="runCode()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2.5 rounded-lg transition transform hover:-translate-y-0.5 active:translate-y-0 text-sm shadow-lg shadow-emerald-900/30 flex items-center gap-2 cursor-pointer">
+                        ▶️ Kodu Çalıştır
+                    </button>
+                </div>
+
+                <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[400px]">
+                    <!-- Editor -->
+                    <div class="flex flex-col bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                        <div class="bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-400 border-b border-slate-800 flex justify-between items-center">
+                            <span>KOD EDİTÖRÜ (HTML + CSS + JS BİRLEŞİK)</span>
+                            <span class="text-indigo-400">index.html</span>
+                        </div>
+                        <textarea id="code-editor" class="flex-1 w-full p-4 bg-slate-950 text-slate-200 code-font text-xs focus:outline-none resize-none leading-relaxed" placeholder="Kodlarınızı buraya yazın..."></textarea>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="flex flex-col bg-white rounded-xl overflow-hidden shadow-2xl border border-slate-800/10">
+                        <div class="bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-600 border-b border-slate-200">
+                            🖥️ CANLI ÇIKTI ÖNİZLEME (SORUNSUZ AKTİF MOTOR)
+                        </div>
+                        <iframe id="code-preview" class="flex-1 w-full bg-white" sandbox="allow-scripts"></iframe>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 text-center py-3 text-xs text-slate-500 code-font">
+        DevGiriş Ultimate Kütüphanesi © 2026 | Kod yazarak dünyayı baştan tasarla.
+    </footer>
+
+    <!-- Logic Controller Scripts -->
+    <script>
+        // Güvenli Şifre Giriş Doğrulaması
+        function verifyPassword() {
+            const input = document.getElementById('pwd-input');
+            const errorMsg = document.getElementById('pwd-error');
+            const card = document.getElementById('password-card');
+            const screen = document.getElementById('password-screen');
+
+            if (input.value === 'yaz123') {
+                screen.classList.add('opacity-0', 'pointer-events-none');
+                document.body.classList.remove('overflow-hidden');
+            } else {
+                card.classList.add('animate-shake');
+                errorMsg.classList.remove('opacity-0');
+                input.value = '';
+                input.focus();
+                setTimeout(() => card.classList.remove('animate-shake'), 400);
+            }
+        }
+
+        // Akıcı Sekme ve Modül Yönetimi
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+                tab.classList.remove('animate-tab-entry');
+            });
+            
+            const activeTab = document.getElementById('tab-' + tabId);
+            activeTab.classList.remove('hidden');
+            setTimeout(() => activeTab.classList.add('animate-tab-entry'), 10);
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-400', 'hover:bg-slate-900');
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                activeBtn.classList.remove('text-slate-400', 'hover:bg-slate-900');
+            }
+
+            const titles = {
+                'welcome': 'Algoritmalar & Veri Yapıları',
+                'html': 'Profesyonel HTML5 & SEO',
+                'css': 'İleri Mimari CSS & Grid',
+                'js': 'Modern JS & Asenkron Mimari',
+                'db': 'Veritabanları & Git Sürüm Kontrolü',
+                'playground': 'Canlı Geliştirme Alanı'
+            };
+            document.getElementById('current-module-title').innerText = titles[tabId];
+        }
+
+        // Ultimate Çok Boyutlu Şablon Deposu
+        const templates = {
+            html: `<!-- HTML5 LocalStorage Entegrasyonlu Veri Kayıt Simülasyonu -->
+<main style="font-family: sans-serif; max-w: 450px; margin: 20px auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+    <header style="text-align: center; margin-bottom: 20px;">
+        <h2 style="color: #0f172a; margin: 0; font-size: 22px;">Tarayıcı Hafızası Kaydı</h2>
+        <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Veriler LocalStorage üzerinde tutulur (Sayfa yenilense de kalır).</p>
+    </header>
+    
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px; text-transform: uppercase;">Notunu Yaz:</label>
+            <textarea id="not-alani" placeholder="Kanka buraya kalıcı bir şeyler karala..." style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; min-height: 80px; font-family: inherit;"></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="kaydet()" style="flex: 1; background: #4f46e5; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Hafızaya Kaydet</button>
+            <button onclick="sil()" style="background: #ef4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Sil</button>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.getElementById('not-alani').value = localStorage.getItem('kanka_notu') || '';
+
+    function kaydet() {
+        const metin = document.getElementById('not-alani').value;
+        localStorage.setItem('kanka_notu', metin);
+        alert('Veri LocalStorage içerisine başarıyla kilitlendi kanka!');
+    }
+    function sil() {
+        localStorage.removeItem('kanka_notu');
+        document.getElementById('not-alani').value = '';
+        alert('Hafıza temizlendi.');
+    }
+<\/script>`,
+
+            css: `<!-- Gelişmiş CSS Grid Dashboard Düzeni & Responsive Simülatör -->
+<style>
+    .Dashboard-Grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 20px;
+        font-family: sans-serif;
+    }
+    
+    @media (min-width: 400px) {
+        .Dashboard-Grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .Tam-Genislik {
+            grid-column: span 3;
+        }
+    }
+
+    .Kutu {
+        background: linear-gradient(145deg, #ffffff, #f8fafc);
+        border: 1px solid #e2e8f0;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .Kutu-Pro {
+        background: linear-gradient(135deg, #1e1b4b, #311042);
+        color: white;
+    }
+</style>
+
+<div class="Dashboard-Grid">
+    <div class="Kutu Kutu-Pro Tam-Genislik">
+        <h3 style="margin: 0; font-size: 18px;">📊 CSS Grid Dashboard Kontrol Paneli</h3>
+        <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.8;">Grid düzenini dinamik olarak izle.</p>
+    </div>
+    <div class="Kutu">
+        <h4 style="margin: 0; color: #4f46e5;">10,240</h4>
+        <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">Anlık İstek (O(1))</p>
+    </div>
+    <div class="Kutu">
+        <h4 style="margin: 0; color: #10b981;">%99.9</h4>
+        <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">Uptime</p>
+    </div>
+    <div class="Kutu">
+        <h4 style="margin: 0; color: #f59e0b;">12ms</h4>
+        <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">Gecikme</p>
+    </div>
+</div>`,
+
+            js: `<!-- İleri Seviye Asenkron Fetch API Motoru -->
+<main style="font-family: sans-serif; max-w: 500px; margin: 20px auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fafafa;">
+    <h3 style="margin: 0 0 10px 0; text-align: center; color: #0f172a;">GitHub Profil Veri Motoru (Async/Fetch)</h3>
+    
+    <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+        <input type="text" id="github-username" value="github" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+        <button onclick="profilGetir()" style="background: #0f172a; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Veri Çek</button>
+    </div>
+
+    <div id="profil-kart" style="display: none; background: white; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; text-align: center;">
+        <img id="profil-avatar" src="" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 10px; border: 2px solid #4f46e5; object-fit: cover;">
+        <h4 id="profil-isim" style="margin: 0; color: #0f172a;">-</h4>
+        <p id="profil-biyo" style="font-size: 12px; color: #64748b; margin: 6px 0 0 0;">-</p>
+    </div>
+    <div id="yukleniyor-ekran" style="display: none; text-align: center; color: #4f46e5; font-weight: bold;">Veri asenkron olarak çekiliyor...</div>
+</main>
+
+<script>
+    async function profilGetir() {
+        const username = document.getElementById('github-username').value;
+        const kart = document.getElementById('profil-kart');
+        const yukleniyor = document.getElementById('yukleniyor-ekran');
+        
+        kart.style.display = 'none';
+        yukleniyor.style.display = 'block';
+
+        try {
+            let response = await fetch('https://api.github.com/users/' + username);
+            if (!response.ok) throw new Error('Kullanıcı bulunamadı.');
+            let data = await response.json();
+
+            document.getElementById('profil-avatar').src = data.avatar_url;
+            document.getElementById('profil-isim').innerText = data.name || data.login;
+            document.getElementById('profil-biyo').innerText = data.bio || 'Biyografi yok.';
+
+            yukleniyor.style.display = 'none';
+            kart.style.display = 'block';
+        } catch (hata) {
+            yukleniyor.style.display = 'none';
+            alert('Hata: ' + hata.message);
+        }
+    }
+<\/script>`,
+
+            db: `<!-- Esnek NoSQL Veri Giriş ve Dokümantasyon Simülasyonu -->
+<main style="font-family: sans-serif; max-w: 480px; margin: 20px auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff;">
+    <h3 style="margin: 0 0 6px 0; color: #0f172a;">Doküman Tabanlı (NoSQL) Veri Ekleme</h3>
+    <p style="font-size: 12px; color: #64748b; margin: 0 0 15px 0;">MongoDB benzeri şemasız, esnek JSON nesnesi oluşturma simülatörü.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="db-key" placeholder="Anahtar (Örn: oyuncu_adi)" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+        <input type="text" id="db-value" placeholder="Değer (Örn: PortakalOyuncu)" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+        <button onclick="koleksiyonaEkle()" style="background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Koleksiyona (Collection) Push Et</button>
+    </div>
+
+    <h4 style="margin: 15px 0 5px 0; font-size: 13px; color: #334155;">Aktif JSON Çıktısı:</h4>
+    <pre id="json-render" style="background: #0f172a; color: #34d399; padding: 12px; border-radius: 8px; font-size: 12px; overflow-x: auto; font-family: monospace;">{
+  "_id": "64b0f172a5b2",
+  "status": "active"
+}</pre>
+</main>
+
+<script>
+    let currentDoc = {
+        "_id": "64b0f172a5b2",
+        "status": "active"
+    };
+
+    function koleksiyonaEkle() {
+        const key = document.getElementById('db-key').value.trim();
+        const value = document.getElementById('db-value').value.trim();
+
+        if(!key || !value) {
+            alert('Lütfen iki alanı da doldur kanka!');
+            return;
+        }
+
+        currentDoc[key] = value;
+        document.getElementById('json-render').innerText = JSON.stringify(currentDoc, null, 2);
+        document.getElementById('db-key').value = '';
+        document.getElementById('db-value').value = '';
+    }
+<\/script>`
+        };
+
+        function loadDemo(type) {
+            document.getElementById('code-editor').value = templates[type];
+            switchTab('playground');
+            runCode();
+        }
+
+        // Modern Güvenli Derleyici Motoru (srcdoc Mimarisi)
+        function runCode() {
+            const code = document.getElementById('code-editor').value;
+            const previewFrame = document.getElementById('code-preview');
+            
+            // srcdoc kullanarak tarayıcının Cross-Origin engellerini tamamen deliyoruz kanka!
+            previewFrame.srcdoc = code;
+        }
+
+        // Varsayılan ilk yükleme kurulumu
+        document.getElementById('code-editor').value = templates['html'];
+    </script>
+</body>
+</html>
